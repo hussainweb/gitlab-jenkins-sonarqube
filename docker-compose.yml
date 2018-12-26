@@ -1,0 +1,48 @@
+version: "3"
+services:
+  web:
+    image: 'gitlab/gitlab-ce:latest'
+    restart: always
+    hostname: 'gitlab'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://localhost:8000'
+    ports:
+      - '8000:8000'
+      - '8443:8443'
+      - '22:22'
+    volumes:
+      - 'gitlab-config:/etc/gitlab'
+      - 'gitlab-logs:/var/log/gitlab'
+      - 'gitlab-data:/var/opt/gitlab'
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    restart: always
+    hostname: 'jenkins'
+    ports:
+      - '8080:8080'
+      - '50000:50000'
+    volumes:
+      - 'jenkins_home:/var/jenkins_home'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+  sonarqube:
+    image: 'sonarqube:7.4-community'
+    ports:
+      - '9000:9000'
+    volumes:
+      - 'sonarqube_conf:/opt/sonarqube/conf'
+      - 'sonarqube_data:/opt/sonarqube/data'
+      - 'sonarqube_logs:/opt/sonarqube/logs'
+      - 'sonarqube_extensions:/opt/sonarqube/extensions'
+
+volumes:
+  gitlab-data:
+  gitlab-logs:
+  gitlab-config:
+  jenkins_home:
+  sonarqube_conf:
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:
